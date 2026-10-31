@@ -9,15 +9,13 @@ DEFAULT_PORT="8080"
 SERVER_PID=""
 
 cleanup() {
-    echo
-    echo "Encerrando o servidor..."
-
     if [ -n "${SERVER_PID:-}" ] && kill -0 "$SERVER_PID" 2>/dev/null; then
+        echo
+        echo "Encerrando o servidor..."
         kill "$SERVER_PID" 2>/dev/null || true
         wait "$SERVER_PID" 2>/dev/null || true
+        echo "Servidor encerrado."
     fi
-
-    echo "Servidor encerrado."
 }
 
 trap cleanup INT TERM EXIT
@@ -41,6 +39,7 @@ if [ ! -d "$SHARED_DIR" ]; then
 fi
 
 if [ ! -d "$SHARED_DIR" ]; then
+    echo
     echo "O armazenamento compartilhado não está acessível."
     echo "Verifique a permissão de arquivos do Termux."
     exit 1
@@ -51,7 +50,7 @@ echo "Acesso ao armazenamento confirmado."
 echo
 echo "[2/6] Instalando dependências..."
 
-pkg install wget tar iproute2 -y
+pkg install wget tar python -y
 
 echo
 echo "[3/6] Verificando arquitetura..."
@@ -72,6 +71,7 @@ case "$ARCH" in
         FILE="linux-armv5-filebrowser.tar.gz"
         ;;
     *)
+        echo
         echo "Arquitetura não suportada: $ARCH"
         exit 1
         ;;
@@ -79,38 +79,42 @@ esac
 
 echo "Arquitetura detectada: $ARCH"
 
+echo
+echo "[4/6] Verificando File Browser..."
+
 if ! command -v filebrowser >/dev/null 2>&1; then
-    echo
-    echo "[4/6] Instalando File Browser..."
+
+    echo "File Browser não encontrado."
+    echo "Baixando..."
 
     TEMP_DIR="$(mktemp -d)"
 
-    trap 'rm -rf "$TEMP_DIR"; cleanup' INT TERM EXIT
-
     cd "$TEMP_DIR"
 
-    DOWNLOAD_BASE="https://github.com"
-    DOWNLOAD_PATH="/filebrowser/filebrowser/releases/latest/download"
-
     wget --show-progress \
-        "$DOWNLOAD_BASE$DOWNLOAD_PATH/$FILE"
+        "https://github.com/filebrowser/filebrowser/releases/latest/download/$FILE"
 
     tar -xzf "$FILE"
 
     if [ ! -f "filebrowser" ]; then
-        echo "O executável não foi encontrado no pacote."
+        echo
+        echo "O executável do File Browser não foi encontrado."
         exit 1
     fi
 
     install -m 755 filebrowser "$PREFIX/bin/filebrowser"
 
     cd "$HOME"
+
     rm -rf "$TEMP_DIR"
 
-    trap cleanup INT TERM EXIT
-else
     echo
-    echo "[4/6] File Browser já está instalado."
+    echo "File Browser instalado com sucesso."
+
+else
+
+    echo "File Browser já está instalado."
+
 fi
 
 echo
@@ -122,12 +126,25 @@ echo "[5/6] Configurando servidor..."
 FIRST_INSTALL="false"
 
 if [ ! -f "$DB" ]; then
-    filebrowser -d "$DB" config init
+
+    echo "Criando banco de dados..."
+
+    filebrowser -d "$DB" config init >/dev/null
+
     FIRST_INSTALL="true"
+
 fi
 
 if [ "$FIRST_INSTALL" = "true" ]; then
+
+    echo
+    echo "======================================"
+    echo "         CRIAR USUÁRIO"
+    echo "======================================"
+    echo
+
     while true; do
+
         read -rp "Nome de usuário: " USERNAME
 
         if [ -n "$USERNAME" ]; then
@@ -135,9 +152,11 @@ if [ "$FIRST_INSTALL" = "true" ]; then
         fi
 
         echo "O usuário não pode ficar vazio."
+
     done
 
     while true; do
+
         read -rsp "Senha com pelo menos 12 caracteres: " PASSWORD
         echo
 
@@ -154,21 +173,36 @@ if [ "$FIRST_INSTALL" = "true" ]; then
         fi
 
         echo "As senhas não coincidem."
+
     done
 
     filebrowser \
         -d "$DB" \
         users add "$USERNAME" "$PASSWORD" \
-        --perm.admin
+        --perm.admin >/dev/null
 
     unset PASSWORD PASSWORD_CONFIRMATION
+
+    echo
+    echo "Usuário criado."
+
 else
+
     echo "O banco de dados já existe."
     echo "A criação de usuário será ignorada."
+
 fi
 
+echo
+echo "======================================"
+echo "       CONFIGURAÇÃO DA PORTA"
+echo "======================================"
+echo
+
 while true; do
+
     read -rp "Porta [$DEFAULT_PORT]: " PORT
+
     PORT="${PORT:-$DEFAULT_PORT}"
 
     if ! [[ "$PORT" =~ ^[0-9]+$ ]]; then
@@ -181,26 +215,35 @@ while true; do
         continue
     fi
 
-    if ss -ltn 2>/dev/null | grep -q ":$PORT "; then
-        echo "A porta $PORT já está sendo utilizada."
-        continue
-    fi
-
     break
+
 done
 
-IP="$(
-    ip -4 route get 1.1.1.1 2>/dev/null |
-    awk '{for (i=1; i<=NF; i++) if ($i=="src") print $(i+1)}' |
-    head -n 1
-)"
+echo
+echo "Porta escolhida: $PORT"
 
-if [ -z "$IP" ]; then
-    IP="$(
-        ip -4 addr show 2>/dev/null |
-        awk '/inet / && $2 !~ /^127\./ {sub(/\/.*/, "", $2); print $2; exit}'
-    )"
-fi
+echo
+echo "Detectando IP local..."
+
+IP="$(python - <<'PY' 2>/dev/null || true
+import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+try:
+    s.connect(("1.1.1.1", 80))
+    ip = s.getsockname()[0]
+
+    if ip and not ip.startswith("127."):
+        print(ip)
+
+except OSError:
+    pass
+
+finally:
+    s.close()
+PY
+)"
 
 echo
 echo "[6/6] Iniciando servidor local..."
@@ -216,7 +259,9 @@ SERVER_PID=$!
 sleep 2
 
 if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+    echo
     echo "O servidor não conseguiu iniciar."
+    SERVER_PID=""
     exit 1
 fi
 
@@ -224,17 +269,32 @@ echo
 echo "======================================"
 echo "       SERVIDOR LOCAL INICIADO"
 echo "======================================"
+echo
 
 if [ -n "$IP" ]; then
-    echo "Endereço local: http://$IP:$PORT"
+
+    echo "Acesse pelo navegador:"
+    echo
+    echo "http://$IP:$PORT"
+
 else
-    echo "Não foi possível detectar o IP."
-    echo "Consulte o endereço Wi-Fi nas configurações do Android."
+
+    echo "Servidor iniciado na porta $PORT."
+    echo
+    echo "Não foi possível detectar automaticamente"
+    echo "o endereço IP deste aparelho."
+    echo
+    echo "Consulte:"
+    echo "Configurações > Wi-Fi > sua rede > Endereço IP"
+
 fi
 
 echo
-echo "Diretório compartilhado: $SHARED_DIR"
+echo "Diretório compartilhado:"
+echo "$SHARED_DIR"
+echo
 echo "Pressione CTRL+C para encerrar."
 echo
 
 wait "$SERVER_PID"
+
