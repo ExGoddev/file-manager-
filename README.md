@@ -13,6 +13,16 @@ Você poderá acessar os arquivos do celular pelo navegador de outro celular, ta
 
 ## 🚀 Instalação
 
+## 📥 Instalando o Termux
+
+Para este projeto, recomendamos instalar o **Termux pelo F-Droid**:
+
+https://f-droid.org/packages/com.termux/
+
+Baixe e instale o Termux pelo link acima. Depois abra o aplicativo e continue com as instruções de instalação abaixo.
+
+> ⚠️ Evite misturar instalações do Termux e seus complementos provenientes de fontes diferentes.
+
 ### 1. Atualize o Termux
 
 ```bash
