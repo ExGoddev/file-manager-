@@ -1,56 +1,103 @@
 # 📱 Servidor de arquivos local no Android
 
-Script para transformar um dispositivo Android em um servidor de arquivos local utilizando Termux e File Browser.
+Transforme um celular Android em um servidor de arquivos local usando **Termux + File Browser**.
 
-Este projeto é uma versão modificada e aprimorada do projeto original [`gio-yaml/android-nas`](https://github.com/gio-yaml/android-nas).
+O servidor permite acessar os arquivos do celular pelo navegador de outro celular, tablet ou computador conectado à mesma rede Wi-Fi.
 
-## Instalação
+## 📋 Requisitos
 
-Instale o [Termux](https://f-droid.org/packages/com.termux/) e execute:
+- Android
+- Termux
+- Wi-Fi
+- Não precisa de root
+
+## 🚀 Instalação
+
+### 1. Atualize o Termux
 
 ```bash
 pkg update
+```
+
+### 2. Instale o Git
+
+```bash
 pkg install git -y
 ```
 
-Clone o projeto:
+### 3. Clone o projeto
 
 ```bash
 git clone https://github.com/ExGoddev/file-manager-.git
 ```
 
-Entre na pasta:
+### 4. Entre na pasta
 
 ```bash
 cd file-manager-
 ```
 
-Execute:
+### 5. Execute o instalador
 
 ```bash
 bash install.sh
 ```
 
-O instalador vai solicitar as permissões necessárias e permitir configurar:
+O instalador irá:
 
-- usuário;
-- senha;
-- porta do servidor.
+- configurar o acesso aos arquivos do Android;
+- instalar as dependências;
+- detectar a arquitetura do aparelho;
+- instalar o File Browser;
+- criar o banco de dados;
+- solicitar usuário e senha;
+- permitir escolher a porta;
+- detectar automaticamente o IP local;
+- iniciar o servidor.
 
-Ao finalizar, será exibido um endereço semelhante a:
+A porta padrão é:
+
+```text
+8080
+```
+
+Basta pressionar **ENTER** para utilizá-la.
+
+## 🌐 Acessando o servidor
+
+Quando estiver funcionando, será exibido um endereço parecido com:
 
 ```text
 http://192.168.1.10:8080
 ```
 
-Abra esse endereço em outro dispositivo conectado à mesma rede Wi-Fi e faça login.
+Abra esse endereço no navegador de outro dispositivo conectado à mesma rede Wi-Fi.
+
+Entre utilizando o usuário e a senha criados durante a primeira instalação.
+
+## 🛑 Encerrando
+
+Para parar o servidor, pressione:
+
+```text
+CTRL+C
+```
 
 ## ⚠️ Importante
 
-Este projeto foi desenvolvido para testes em **rede local**. Não exponha diretamente a porta do servidor à internet.
+Este projeto foi desenvolvido para uso e testes em **rede local**.
 
-## Créditos
+Não exponha diretamente a porta do File Browser à internet.
 
-Baseado no projeto original [gio-yaml/android-nas](https://github.com/gio-yaml/android-nas).
+Mantenha backup dos seus arquivos importantes.
+
+## 🙏 Créditos
+
+Este projeto é uma versão modificada e aprimorada do projeto original:
+
+**gio-yaml/android-nas**
+
+https://github.com/gio-yaml/android-nas
 
 Modificações e melhorias desta versão por **ExGoddev**.
+
