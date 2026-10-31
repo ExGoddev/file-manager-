@@ -2,14 +2,14 @@
 
 Transforme um celular Android em um servidor de arquivos local usando **Termux + File Browser**.
 
-O servidor permite acessar os arquivos do celular pelo navegador de outro celular, tablet ou computador conectado à mesma rede Wi-Fi.
+Você poderá acessar os arquivos do celular pelo navegador de outro celular, tablet ou computador conectado à mesma rede Wi-Fi.
 
 ## 📋 Requisitos
 
-- Android
+- celular Android
 - Termux
-- Wi-Fi
-- Não precisa de root
+- conexão Wi-Fi
+- não precisa de root
 
 ## 🚀 Instalação
 
@@ -43,41 +43,85 @@ cd file-manager-
 bash install.sh
 ```
 
-O instalador irá:
+O instalador fará a configuração automaticamente.
 
-- configurar o acesso aos arquivos do Android;
-- instalar as dependências;
-- detectar a arquitetura do aparelho;
-- instalar o File Browser;
-- criar o banco de dados;
-- solicitar usuário e senha;
-- permitir escolher a porta;
-- detectar automaticamente o IP local;
-- iniciar o servidor.
+Na primeira execução, você deverá criar um nome de usuário e uma senha.
 
-A porta padrão é:
+## 🔐 Criando usuário e senha
+
+Quando aparecer:
 
 ```text
-8080
+Nome de usuário:
 ```
 
-Basta pressionar **ENTER** para utilizá-la.
+digite o usuário que deseja utilizar e pressione **ENTER**.
+
+Depois será solicitada uma senha:
+
+```text
+Senha com pelo menos 12 caracteres:
+```
+
+> ⚠️ **Importante:** enquanto você digita a senha, nada aparece na tela. Nem letras, nem números e nem `*****`. Isso é normal no Termux.
+
+Digite sua senha normalmente e pressione **ENTER**.
+
+Depois digite novamente a mesma senha para confirmar.
+
+A senha precisa ter pelo menos **12 caracteres**.
+
+## 🔌 Escolhendo a porta
+
+Durante a instalação aparecerá:
+
+```text
+Porta ```
+
+A porta padrão é **8080**.
+
+Se quiser usar a porta 8080, **não digite nada**.
+
+Apenas pressione **ENTER** para continuar.
+
+O resultado será:
+
+```text
+Porta escolhida: 8080
+```
+
+Se quiser utilizar outra porta, digite o número e pressione **ENTER**.
+
+Exemplo:
+
+```text
+Porta 8085
+Porta escolhida: 8085
+```
+
+Para a maioria dos usuários, basta pressionar **ENTER** e continuar utilizando a porta padrão `8080`.
 
 ## 🌐 Acessando o servidor
 
-Quando estiver funcionando, será exibido um endereço parecido com:
+Quando tudo estiver pronto, aparecerá algo parecido com:
 
 ```text
+SERVIDOR LOCAL INICIADO
+
+Acesse pelo navegador:
+
 http://192.168.1.10:8080
 ```
 
-Abra esse endereço no navegador de outro dispositivo conectado à mesma rede Wi-Fi.
+Abra o endereço mostrado em um navegador.
 
-Entre utilizando o usuário e a senha criados durante a primeira instalação.
+Para acessar de outro celular, tablet ou computador, conecte o dispositivo à **mesma rede Wi-Fi** do celular que está executando o servidor.
 
-## 🛑 Encerrando
+Depois faça login usando o usuário e a senha criados durante a instalação.
 
-Para parar o servidor, pressione:
+## 🛑 Encerrando o servidor
+
+Para parar o servidor, volte ao Termux e pressione:
 
 ```text
 CTRL+C
@@ -89,7 +133,7 @@ Este projeto foi desenvolvido para uso e testes em **rede local**.
 
 Não exponha diretamente a porta do File Browser à internet.
 
-Mantenha backup dos seus arquivos importantes.
+Mantenha sempre uma cópia de segurança dos seus arquivos importantes.
 
 ## 🙏 Créditos
 
