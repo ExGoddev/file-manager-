@@ -248,8 +248,14 @@ PY
 echo
 echo "[6/6] Iniciando servidor local..."
 
+if [ -n "$IP" ]; then
+    BIND_ADDRESS="$IP"
+else
+    BIND_ADDRESS="0.0.0.0"
+fi
+
 filebrowser \
-    -a 0.0.0.0 \
+    -a "$BIND_ADDRESS" \
     -p "$PORT" \
     -r "$SHARED_DIR" \
     -d "$DB" &
